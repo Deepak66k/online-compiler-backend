@@ -1,5 +1,8 @@
 FROM python:3.10-slim
 
+# Install Node.js
+RUN apt-get update && apt-get install -y nodejs npm
+
 WORKDIR /app
 
 COPY requirements.txt .

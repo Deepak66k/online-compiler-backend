@@ -9,6 +9,7 @@ import uuid
 import os
 import glob
 import re
+import sys
 
 # --- CONFIGURATION & LIMITER ---
 limiter = Limiter(key_func=get_remote_address)
@@ -34,6 +35,30 @@ LANG_CONFIG = {
 class CodeRequest(BaseModel):
     code: str
     language: str
+
+@app.get("/versions")
+async def get_versions():
+    try:
+        # Get Python version
+        py_ver = f"{sys.version_info.major}.{sys.version_info.minor}"
+        
+        # Get Node version
+        # Added shell=True for better local compatibility on Windows
+        node_result = subprocess.run(
+            ["node", "-v"], 
+            capture_output=True, 
+            text=True,
+            shell=True 
+        )
+        node_ver = node_result.stdout.strip().replace('v', '')
+        
+        return {
+            "python": py_ver,
+            "javascript": node_ver
+        }
+    except Exception:
+        # Fallback if node isn't found
+        return {"python": "3.x", "javascript": "20.x"}
 
 # --- STARTUP CLEANUP ---
 @app.on_event("startup")
